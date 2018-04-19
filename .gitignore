@@ -1,52 +1,56 @@
-# Prerequisites
-*.d
+## Copyright (C) logi.cals GmbH. All rights reserved.
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+#================
+#Mac OS X hidden files/folders
+#================
+.DS_Store
+._.DS_Store
 
-# Linker output
-*.ilk
-*.map
-*.exp
+#================
+#WinXP hidden files/folders
+#================
+*Thumbs.db
 
-# Precompiled Headers
-*.gch
-*.pch
+#================
+#Documentation artifacts
+#================
+*.dia~
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+#================
+#Assembly artifacts
+#================
+#?? *.zip
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+#================
+#vi tmp files
+#backup-files
+#================
+*.swp
+*~
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+#================
+#excel  files
+#================
+.xls
+.xlsx
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+#================
+#logi.CAD3 generated files
+#================
+**/src-gen/*
+**/target/*
+
+#================
+#logi.CAD3 database files
+#================
+*.db
+
+.fingerprint
+.gdbinit
+.cproject
+*.launch
+
+.logfile
+LC3/Selbsttest/src-gen/*
+LC32_zip/Selbsttest.L2P/*

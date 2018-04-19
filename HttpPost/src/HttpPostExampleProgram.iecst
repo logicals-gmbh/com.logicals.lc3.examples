@@ -1,0 +1,7 @@
+PROGRAM HttpPostExampleProgram
+	VAR
+	  status : DINT;
+	END_VAR
+	
+	HttpPost(URL := 'http://192.168.1.152:8000/', PostFields := 'name=daniel&project=curl', ReturnCode => status, ENO => ENO);
+END_PROGRAM

@@ -1,0 +1,11 @@
+{extern_c}
+
+FUNCTION HttpPost
+	VAR_INPUT
+		URL : STRING[1024];
+		PostFields : STRING[1024];
+	END_VAR
+	VAR_OUTPUT
+		ReturnCode : DINT;
+	END_VAR
+END_FUNCTION

@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+ptk.properties.additionalSources.path.LinuxX86=
+ptk.properties.additionalSources.path.RevolutionPi=
+ptk.properties.additionalSources.path.WindowsX86=
+ptk.properties.disabledCodeGenerationServices.id.LinuxX86=
+ptk.properties.disabledCodeGenerationServices.id.RevolutionPi=
+ptk.properties.disabledCodeGenerationServices.id.WindowsX86=
+ptk.properties.include.path.LinuxX86=../../../src/HttpLib/native/linuxx86/h
+ptk.properties.include.path.RevolutionPi=../../../src/HttpLib/native/revolutionpi/h
+ptk.properties.include.path.WindowsX86=../../../src/HttpLib/native/windowsx86/h
+ptk.properties.library.name.LinuxX86=curl-gnutls
+ptk.properties.library.name.RevolutionPi=curl-gnutls
+ptk.properties.library.name.WindowsX86=curl;curl.dll
+ptk.properties.library.path.LinuxX86=../../../src/HttpLib/native/linuxx86/lib
+ptk.properties.library.path.RevolutionPi=../../../src/HttpLib/native/revolutionpi/lib
+ptk.properties.library.path.WindowsX86=../../../src/HttpLib/native/windowsx86/lib
+ptk.properties.selected.platform=WindowsX86
