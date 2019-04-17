@@ -1,0 +1,21 @@
+/*
+ * This is a logi.CAD 3 template for the local PLC object
+ */
+
+{
+	CHANNEL LocalChannel
+		TCP
+			ADDRESS := 127.0.0.1;
+			PORT    := 1534;
+		END_TCP
+	END_CHANNEL
+}
+
+CONFIGURATION LocalConfiguration
+	RESOURCE local ON BuiltInPlc { ON_CHANNEL := LocalChannel }
+		{ INCLUDE_GLOBALS  GlobalVariables }
+		TASK DefaultTask(INTERVAL := TIME#500ms, PRIORITY := 38229);
+		PROGRAM MQTT_Sample WITH DefaultTask :
+			MQTT_Sample;
+	END_RESOURCE
+END_CONFIGURATION

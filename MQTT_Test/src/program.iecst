@@ -1,0 +1,62 @@
+PROGRAM MQTT_Sample
+	VAR
+		ioImageRemote : ARRAY [0..1023] OF BYTE;
+		sLastMessage : STRING[1024];
+		ioImageRemoteSize : DINT := 1024;
+		ioImageRemoteLen : DINT := -1;
+		topic : STRING[255];
+		ch : DINT := -1;
+		rc : MQTT_RC;
+		state : MQTT_SUBSCRIBER_STATE := MQTT_SUBSCRIBER_STATE#INVALID;
+
+		subscribed : BOOL := FALSE;
+		message_received : BOOL := FALSE;
+
+		MQTT_Publish_Timer : TON;
+		sMQTT_Payload : STRING[100] := '{"actorProperty1":"1","actorProperty2":"2"}';
+	END_VAR
+	VAR_EXTERNAL
+		sMQTT_Broker_Adress : STRING[16];
+		sMQTT_Client_ID : STRING[10];
+	END_VAR
+
+	state := MQTT_GetState(ch := ch, rc => rc, ENO => ENO);
+
+	IF state <> MQTT_SUBSCRIBER_STATE#CONNECTING AND state <> MQTT_SUBSCRIBER_STATE#CONNECTED THEN
+		ch := MQTT_Connect(address := sMQTT_Broker_Adress, clientId := sMQTT_Client_ID, rc => rc, ENO => ENO);
+	END_IF;
+
+	MQTT_Publish_Timer(IN := NOT MQTT_Publish_Timer.Q, PT := T#5s);
+
+	IF state = MQTT_SUBSCRIBER_STATE#CONNECTED THEN
+
+		// publish data if timer has elapsed (default: every 5 seconds) 
+		IF MQTT_Publish_Timer.Q THEN
+			MQTT_Publish(ch := ch, topic := '/building1/floor1/room1/actor1', payload := GET_BYTE_REF(IN:=sMQTT_Payload), len := LEN(sMQTT_Payload), rc => rc);
+		END_IF;
+
+		/* connect to topic in case connection has been established */
+		IF NOT(subscribed) THEN
+			MQTT_Subscribe(ch := ch, topic := '/building1/floor1/room1/sensor1', rc => rc);
+			subscribed := rc = MQTT_RC#OK;
+		END_IF;
+
+		IF subscribed THEN
+			/* if subscribed, obtain only the latest message */
+			message_received := FALSE;
+			REPEAT
+				topic := MQTT_Receive(ch := ch, payload := REF(ioImageRemote[0]), payload_len := ioImageRemoteSize, len => ioImageRemoteLen, rc => rc);
+				IF rc <> MQTT_RC#OK THEN
+					EXIT;
+				END_IF;
+				message_received := TRUE;
+				// convert the received byte array to a string
+				sLastMessage := StringFromByteArray(ioImageRemote, ioImageRemoteLen);
+			UNTIL TRUE
+			END_REPEAT;
+		END_IF;
+	ELSE
+		/* if connection has been lost, subscription has been canceled as well*/
+		subscribed := FALSE;
+	END_IF;
+END_PROGRAM

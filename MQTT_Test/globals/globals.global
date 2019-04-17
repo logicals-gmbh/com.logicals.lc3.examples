@@ -1,0 +1,6 @@
+GLOBALS GlobalVariables
+	VAR_GLOBAL
+		sMQTT_Broker_Adress : STRING[16] := '127.0.0.1:1883';
+		sMQTT_Client_ID : STRING[10] := 'logiRTS';
+	END_VAR
+END_GLOBALS

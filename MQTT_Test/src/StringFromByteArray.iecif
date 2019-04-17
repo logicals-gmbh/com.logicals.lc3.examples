@@ -1,0 +1,8 @@
+{extern_c}
+
+FUNCTION StringFromByteArray : STRING[1024]
+	VAR_INPUT
+		byteArray : ARRAY [0..1023] OF BYTE;
+		len : DINT;
+	END_VAR
+END_FUNCTION

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<project>
+    <configuration name="LocalConfiguration">
+        <resource name="local">
+            <variable instancePath="MQTT_Sample.sLastMessage"/>
+            <variable instancePath="MQTT_Sample.state"/>
+            <variable instancePath="MQTT_Sample.sMQTT_Broker_Adress"/>
+            <variable instancePath="MQTT_Sample.sMQTT_Client_ID"/>
+        </resource>
+    </configuration>
+</project>
