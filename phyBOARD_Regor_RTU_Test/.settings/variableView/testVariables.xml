@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<project>
+    <configuration name="phyBoardConfig">
+        <resource name="phyBoard_Regor">
+            <variable instancePath="ProgramModbusTest.connectionEstablished"/>
+            <variable instancePath="ProgramModbusTest.writeValue"/>
+            <variable instancePath="ProgramModbusTest.modbusHandle"/>
+            <variable instancePath="ProgramModbusTest.writeRC"/>
+            <variable instancePath="ProgramModbusTest.MB_connect.initCount"/>
+            <variable instancePath="ProgramModbusTest.MB_connect.initRtuRC"/>
+        </resource>
+    </configuration>
+</project>

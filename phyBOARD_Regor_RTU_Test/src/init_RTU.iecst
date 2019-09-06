@@ -1,0 +1,119 @@
+/*
+ * This function block tries to establish a connection to the Modbus RTU interface at the phyBOARD Regor.
+ */
+FUNCTION_BLOCK MB_RTU_Connect
+	VAR
+		init : BOOL;
+		initCount : INT;
+		initMax : INT;
+		MBHandle : DINT;
+		initRtuRC : DINT;
+		readInputRegistersRC : DINT;
+		setSlaveRC : DINT;
+		closeRC : DINT;
+		MBData : ARRAY [0..3]OF WORD;
+	END_VAR
+
+	VAR_INPUT
+		connectionReset : BOOL;
+	END_VAR
+
+	VAR_OUTPUT
+		connectionTimeout : BOOL;
+		connectionEstablished : BOOL;
+		modbusHandle : DINT;
+	END_VAR
+
+	INITIAL_STEP step0 :
+		act0();
+	END_STEP
+
+	ACTION act0 :
+		init:=FALSE;
+		initMax:=10;
+		connectionTimeout:=FALSE;
+		connectionEstablished:=FALSE;
+		MBHandle:=-1;
+	END_ACTION
+
+	TRANSITION t0 FROM step0 TO step1
+		:= NOT(init) AND NOT(connectionTimeout) AND NOT(connectionEstablished) AND initMax=10 AND MBHandle=-1;
+	END_TRANSITION
+
+	STEP step1 :
+		initModbusConnetion();
+	END_STEP
+
+	ACTION initModbusConnetion :
+		// make sure that the correct RS485 interface is used here and the parameters (Baudrate, etc.) are correct
+		MB_InitRTU(TimeoutRW:=T#50ms, Device:='/dev/ttyO1', Baud:=115200, DataBit:=8, StopBit:=1, Parity:=MB_PARITY#NONE, MBHandle=>MBHandle, RC=>initRtuRC);
+		// set the slave ID to 16, this is the default for the akYtec SMI2 display
+		// slave ID can be set by using the akYtec SMI2 configuration program
+		MB_SetSlave(MBHandle:=MBHandle, Slave:=16, RC=>setSlaveRC);
+		initCount := initCount + 1;
+	END_ACTION
+
+	TRANSITION tConnectionEstablished FROM step1 TO step2
+		:= initRtuRC = 0 AND setSlaveRC = 0 AND MBHandle > -1;
+	END_TRANSITION
+
+	TRANSITION tConnectionFailed FROM step1 TO step1
+		:= initRtuRC <> 0 OR setSlaveRC <> 0 OR MBHandle = -1;
+	END_TRANSITION
+
+	STEP step2 :
+		testConnection();
+	END_STEP
+
+	ACTION testConnection :
+		MB_ReadInputRegisters(MBHandle:=MBHandle, StartInput:=0, Quantity:=4, Data:=MBData, RC=>readInputRegistersRC);
+	END_ACTION
+
+	TRANSITION tConnectionTested FROM step2 TO step3
+		:= readInputRegistersRC = 0;
+	END_TRANSITION
+
+	TRANSITION tConnectionTestFailed FROM step2 TO step4
+		:= readInputRegistersRC <> 0;
+	END_TRANSITION
+
+	STEP step3 :
+		connectionReady();
+	END_STEP
+
+	ACTION connectionReady :
+		connectionTimeout := FALSE;
+		connectionEstablished := TRUE;
+		modbusHandle := MBHandle;
+	END_ACTION
+
+	STEP step4 :
+		repeatConnecting();
+	END_STEP
+
+	ACTION repeatConnecting :
+		MB_Close(MBHandle:=MBHandle, RC=>closeRC);
+	END_ACTION
+
+	TRANSITION tRepeatConnection FROM step4 TO step0
+		:= closeRC = 0;
+	END_TRANSITION
+
+	TRANSITION tConnectionTimedOut FROM step4 TO step5
+		:= closeRC = 0 AND initCount > initMax;
+	END_TRANSITION
+
+	STEP step5 :
+		connectionTimedOut();
+	END_STEP
+
+	ACTION connectionTimedOut :
+		connectionTimeout := TRUE;
+		connectionEstablished := FALSE;
+		modbusHandle := -1;
+	END_ACTION
+
+	TRANSITION tResetConnection FROM step5 TO step0
+		:= connectionReset;
+	END_TRANSITION
+END_FUNCTION_BLOCK

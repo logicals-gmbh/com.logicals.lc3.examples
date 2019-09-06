@@ -1,0 +1,20 @@
+/*
+ * This is a logi.CAD 3 template for the raspbian PLC object
+ */
+
+{
+	CHANNEL phyBOARD_Channel
+		TCP
+			ADDRESS := 192.168.2.180; // enter the IP address of your phyBOARD Regor controller here
+			PORT    := 1534;
+		END_TCP
+	END_CHANNEL
+}
+
+CONFIGURATION phyBoardConfig
+	RESOURCE phyBoard_Regor ON phyboardRegor { ON_CHANNEL := phyBOARD_Channel }
+		TASK DefaultTask(INTERVAL := TIME#50ms, PRIORITY := 38229);
+		PROGRAM ProgramModbusTest WITH DefaultTask :
+			ProgramModbusTest;
+	END_RESOURCE
+END_CONFIGURATION

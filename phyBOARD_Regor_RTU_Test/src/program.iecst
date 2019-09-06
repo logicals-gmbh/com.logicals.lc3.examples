@@ -1,0 +1,29 @@
+/*
+ * This program establishes a Modbus RTU connection to the RS485 port of a phyBOARD Regor controller.
+ * As soon as the connection is established, an integer value is written to an akYtec SMI2 RS-485 display.
+ */
+PROGRAM ProgramModbusTest
+	VAR
+		modbusHandle : DINT;
+		connectionEstablished : BOOL;
+		MB_connect : MB_RTU_Connect;
+		writeRC : DINT;
+		writeValue : INT := 0;
+		prevValue : INT := -1;
+	END_VAR
+
+	// try to connect
+	IF NOT connectionEstablished THEN
+		MB_connect(connectionEstablished => connectionEstablished, modbusHandle => modbusHandle);
+	ELSE
+		// if connected, check if a chnaged value is available
+		IF (prevValue <> writeValue) THEN
+			Trace(CONCAT('Writing to akYtec Display : ', TO_STRING(writeValue)));
+			// write the changed value to the display
+			// integer values (2 byte value) have to be written to input register 25 according to the akYtec documentation
+			MB_WriteRegister(MBHandle := modbusHandle, Address := 25, Value := writeValue, RC=>writeRC);
+			prevValue := writeValue;
+		END_IF;
+	END_IF;
+
+END_PROGRAM
