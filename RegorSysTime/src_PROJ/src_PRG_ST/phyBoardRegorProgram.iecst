@@ -1,0 +1,73 @@
+/*)
+ * Reads the current system from a phyBOARD Regor PLC.
+ */
+PROGRAM PRG_RegorSysTime
+	
+    VAR
+	  lx_Init     : BOOL;
+	  lx_Run      : BOOL;
+	  lx_Shutdown : BOOL;
+	  lx_Term     : BOOL;
+    END_VAR
+    
+    VAR
+     FB_ReadRegorTime : FB_ReadRegorTime;
+    END_VAR
+    
+    VAR
+         ldi_RTSSeconds   : DINT;
+         ldi_RTSMinutes   : DINT;
+         ldi_RTSHours     : DINT;
+         ldi_RTSDay       : DINT;
+         ldi_RTSMonth     : DINT;
+         ldi_RTSYear      : DINT;
+         ldi_RTSWDay      : DINT; 
+         ldi_RTSYDay      : DINT;
+         lx_RTSIsdst      : BOOL;
+         lstr_RTSWDayName : STRING[16]; 
+    END_VAR
+    
+	
+	VAR
+	  lui_CycleCount   : UINT;
+	  lx_CyclePulse   : BOOL;
+
+      lx_CycleInit    : BOOL;
+      
+      FB_CycleInit : R_TRIG;
+	END_VAR
+
+   /*
+    * InitPulse setzen
+    */ 
+    FB_CycleInit(CLK := TRUE, Q => lx_CycleInit);
+
+    lui_CycleCount := lui_CycleCount +1;
+    lx_CyclePulse := NOT (lx_CyclePulse);
+
+   /*
+    * Query logi.RTS cycle information.
+    */ 
+    RTSCycleInfo(Init => lx_Init, Run => lx_Run, Shutdown => lx_Shutdown, Term => lx_Term);
+   
+   /*
+    * Trace out cycle info. 
+    */    
+    Trace(EN := lx_Init,     Msg    := 'Regor InitialCycle');
+    Trace(EN := lx_Shutdown, Msg    := 'Regor ShutdownCycle');
+
+   /*
+    * Read current system time.
+    */
+    FB_ReadRegorTime(vodi_RTSSeconds   => ldi_RTSSeconds,  
+                     vodi_RTSMinutes   => ldi_RTSMinutes,  
+                     vodi_RTSHours     => ldi_RTSHours,    
+                     vodi_RTSDay       => ldi_RTSDay,      
+                     vodi_RTSMonth     => ldi_RTSMonth,    
+                     vodi_RTSYear      => ldi_RTSYear,     
+                     vodi_RTSWDay      => ldi_RTSWDay,     
+                     vodi_RTSYDay      => ldi_RTSYDay,     
+                     vox_RTSIsdst      => lx_RTSIsdst,     
+                     vostr_RTSWDayName => lstr_RTSWDayName);
+   
+END_PROGRAM

@@ -1,0 +1,68 @@
+/*
+ * Uhrzeit lesen
+ */
+ FUNCTION_BLOCK FB_ReadRegorTime
+
+    VAR_OUTPUT
+        /*
+         * The output variables will hold the current system time after execution of the function block.
+         */
+         vodi_RTSSeconds : DINT;
+         vodi_RTSMinutes : DINT;
+         vodi_RTSHours   : DINT;
+        
+         vodi_RTSDay     : DINT;
+         vodi_RTSMonth   : DINT;
+         vodi_RTSYear    : DINT;
+
+         vodi_RTSWDay    : DINT; 
+         vodi_RTSYDay    : DINT;
+         vox_RTSIsdst    : BOOL;
+
+         vostr_RTSWDayName : STRING[16]; 
+    
+    END_VAR
+    
+    VAR
+       lx_CyclePulse  : BOOL;   
+       lui_CycleCount : UINT;
+    END_VAR
+
+    lx_CyclePulse := NOT(lx_CyclePulse);
+    lui_CycleCount := lui_CycleCount + 1;
+   /*
+    * Read system time (currently only works on Linux based system).
+    */
+    localtime(sec   => vodi_RTSSeconds, 
+              min   => vodi_RTSMinutes, 
+              hour  => vodi_RTSHours, 
+              mday  => vodi_RTSDay,
+              mon   => vodi_RTSMonth, 
+              year  => vodi_RTSYear,
+              wday  => vodi_RTSWDay, 
+              yday  => vodi_RTSYDay,
+              isdst => vox_RTSIsdst);
+
+     IF vodi_RTSWDay = 1 THEN
+         vostr_RTSWDayName := 'Monday'; 
+     END_IF;
+     IF vodi_RTSWDay = 2 THEN
+         vostr_RTSWDayName := 'Tuesday'; 
+     END_IF;
+     IF vodi_RTSWDay = 3 THEN
+         vostr_RTSWDayName := 'Wednesday'; 
+     END_IF;
+     IF vodi_RTSWDay = 4 THEN
+         vostr_RTSWDayName := 'Thursday'; 
+     END_IF;
+     IF vodi_RTSWDay = 5 THEN
+         vostr_RTSWDayName := 'Friday'; 
+     END_IF;
+     IF vodi_RTSWDay = 6 THEN
+         vostr_RTSWDayName := 'Saturday'; 
+     END_IF;
+     IF vodi_RTSWDay = 7 THEN
+         vostr_RTSWDayName := 'Sunday'; 
+     END_IF;
+ 
+ END_FUNCTION_BLOCK

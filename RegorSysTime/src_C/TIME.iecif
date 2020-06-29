@@ -1,0 +1,18 @@
+{ extern_c }
+{ Supported_Platforms := Raspbian , LinuxX86, phyboardRegor }
+
+FUNCTION localtime
+
+VAR_OUTPUT
+	sec : DINT;
+	min : DINT;
+	hour : DINT;
+	mday : DINT;
+	mon : DINT;
+	year : DINT;
+	wday : DINT;
+	yday : DINT;
+	isdst : BOOL;
+END_VAR
+
+END_FUNCTION
