@@ -27,6 +27,11 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.robotframework.ide.eclipse.main.plugin.robotLibrariesBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
@@ -34,19 +39,8 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+		<nature>org.robotframework.ide.eclipse.main.plugin.robotNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>Standard</name>
-			<type>2</type>
-			<locationURI>LIBCACHE_LOC/com.logicals.lc3.library.standard__3.2.2/FOLDER</locationURI>
-		</link>
-		<link>
-			<name>System</name>
-			<type>2</type>
-			<locationURI>LIBCACHE_LOC/com.logicals.lc3.library.system__2.0.16-SNAPSHOT/FOLDER</locationURI>
-		</link>
-	</linkedResources>
 	<filteredResources>
 		<filter>
 			<id>0</id>

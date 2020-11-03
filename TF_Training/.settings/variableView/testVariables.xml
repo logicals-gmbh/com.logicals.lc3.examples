@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<project>
+    <configuration name="LocalConfiguration">
+        <resource name="local">
+            <variable instancePath="Counter.up"/>
+            <variable instancePath="Counter.count"/>
+        </resource>
+    </configuration>
+</project>
