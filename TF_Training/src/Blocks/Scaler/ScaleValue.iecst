@@ -1,0 +1,17 @@
+FUNCTION_BLOCK ScaleValue  {
+    width := 260;
+    bgColor := "darkcyan";
+  }
+	VAR_INPUT
+		VALUE : REAL;
+		FROM_MIN : REAL;
+		FROM_MAX : REAL;
+		TO_MIN : REAL;
+		TO_MAX : REAL;
+	END_VAR
+	VAR_OUTPUT
+		SCALED_VALUE : REAL;
+	END_VAR
+	
+	SCALED_VALUE := ((VALUE - FROM_MIN) / (FROM_MAX - FROM_MIN)) * (TO_MAX - TO_MIN) + TO_MIN;
+END_FUNCTION_BLOCK
