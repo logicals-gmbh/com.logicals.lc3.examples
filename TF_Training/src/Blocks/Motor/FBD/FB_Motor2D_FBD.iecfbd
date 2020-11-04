@@ -1,0 +1,144 @@
+FUNCTION_BLOCK FB_Motor2D_FBD
+  {
+    width := 310;
+  }
+
+  VAR
+    FB_LeftRS : RS;
+    FB_RightRS : RS;
+    FB_LeftR_TRIG : R_TRIG;
+    FB_RightR_TRIG : R_TRIG;
+    FB_LeftTON : TON;
+    FB_RightTON : TON;
+  END_VAR
+  VAR
+    lx_LeftPulse : BOOL;
+    lx_RightPulse : BOOL;
+  END_VAR
+  VAR_INPUT
+    vix_Left : BOOL;
+    vix_Right : BOOL;
+    vix_LeftFB : BOOL;
+    vix_RightFB : BOOL;
+    vit_LeftFBTime : TIME := T#10m;
+    vit_RightFBTime : TIME := T#10m;
+  END_VAR
+  VAR_OUTPUT
+    vox_MotorLeft : BOOL;
+    vox_MotorRight : BOOL;
+    vox_LeftFBErr : BOOL;
+    vox_RightFBErr : BOOL;
+    vox_Err : BOOL;
+    vox_ErrNo : INT;
+  END_VAR
+
+  (*
+
+    // Network 1:
+    FB_RightR_TRIG(CLK := vix_Right, Q => lx_RightPulse);
+
+    // Network 2:
+    FB_LeftR_TRIG(CLK := vix_Left, Q => lx_LeftPulse);
+
+    // Network 3:
+    AND(IN1 := vix_Left, IN2 := vix_Right, AND => vox_Err);
+
+    // Network 4:
+    AND(IN1 := vix_Left, IN2 := vix_Right, AND => @C(39).AND);
+    MOVE(EN := @C(39).AND, IN := 1, MOVE => vox_ErrNo);
+
+    // Network 5:
+    FB_RightRS(S := lx_RightPulse, R1 := vox_MotorLeft, Q1 => vox_MotorRight);
+
+    // Network 6:
+    FB_LeftRS(S := lx_LeftPulse, R1 := vox_MotorRight, Q1 => vox_MotorLeft);
+
+  *)
+
+  @C(1) : @FB(FB_RightR_TRIG), @R(910.0, 150.0, 140.0, 18.0), @I(@N(CLK), @L(9.5)), @O(@N(Q), @R(9.5));
+  @C(2) : @FB(FB_LeftR_TRIG), @R(910.0, 250.0, 140.0, 18.0), @I(@N(CLK), @L(9.5)), @O(@N(Q), @R(9.5));
+  @VF(3) : @E(lx_LeftPulse), @R(1180.0, 250.0, 140.0, 19.0);
+  @VF(4) : @E(lx_RightPulse), @R(1180.0, 150.0, 140.0, 19.0);
+  @VF(7) : @E(vix_Left), @R(650.0, 250.0, 140.0, 19.0);
+  @VF(9) : @E(vix_Right), @R(650.0, 150.0, 140.0, 19.0);
+  @CF(11) : @R(650.0, 90.0, 670.0, 39.0), @T("Right R_TRIG"), @POU;
+  @CF(12) : @R(650.0, 190.0, 670.0, 39.0), @T("Left R_TRIG"), @POU;
+  @C(13) : @FB(FB_LeftRS), @R(990.0, 520.0, 80.0, 38.0), @I(@N(S), @L(9.5)), @I(@N(R1), @L(29.5)), @O(@N(Q1), @R(9.5));
+  @C(14) : @FB(FB_RightRS), @R(990.0, 400.0, 80.0, 38.0), @I(@N(S), @L(9.5)), @I(@N(R1), @L(29.5)), @O(@N(Q1), @R(9.5));
+  @VF(15) : @E(lx_RightPulse), @R(650.0, 400.0, 140.0, 19.0);
+  @VF(17) : @E(lx_LeftPulse), @R(650.0, 520.0, 140.0, 19.0);
+  @VF(19) : @E(vox_MotorLeft), @R(1180.0, 520.0, 140.0, 19.0);
+  @VF(21) : @E(vox_MotorRight), @R(1180.0, 400.0, 140.0, 19.0);
+  @CF(23) : @R(650.0, 330.0, 670.0, 39.0), @T("Left turn"), @POU;
+  @CF(24) : @R(650.0, 460.0, 670.0, 39.0), @T("Right turn"), @POU;
+  @VF(25) : @E(vox_MotorLeft), @R(650.0, 420.0, 140.0, 19.0);
+  @VF(27) : @E(vox_MotorRight), @R(650.0, 540.0, 140.0, 19.0);
+  @CF(29) : @R(650.0, 640.0, 680.0, 39.0), @T("Error bit"), @POU;
+  @VF(30) : @E(vox_Err), @R(1190.0, 700.0, 140.0, 19.0);
+  @VF(31) : @E(vix_Left), @R(660.0, 700.0, 140.0, 19.0);
+  @VF(32) : @E(vix_Right), @R(660.0, 720.0, 140.0, 19.0);
+  @C(33) : @F(AND), @R(1000.0, 700.0, 40.0, 38.0), BOOL, @I(@N(IN1), @L(9.5)), @I(@N(IN2), @L(29.5)), @O(@N(AND), @R(9.5));
+  @CF(37) : @R(650.0, 780.0, 680.0, 39.0), @T("Error no"), @POU;
+  @VF(38) : @E(vox_ErrNo), @R(1190.0, 880.0, 140.0, 19.0);
+  @C(39) : @F(AND), @R(970.0, 860.0, 40.0, 38.0), BOOL, @I(@N(IN1), @L(9.5)), @I(@N(IN2), @L(29.5)), @O(@N(AND), @R(9.5));
+  @VF(40) : @E(vix_Left), @R(660.0, 860.0, 140.0, 19.0);
+  @VF(41) : @E(vix_Right), @R(660.0, 880.0, 140.0, 19.0);
+  @C(44) : @F(MOVE), @R(1100.0, 860.0, 60.0, 38.0), INT, @I(@N(EN), @L(9.5)), @I(@N(IN), @L(29.5)), @O(@N(ENO), @R(9.5)), @O(@N(MOVE), @R(29.5));
+  @VF(47) : @E(1), @R(870.0, 910.0, 140.0, 19.0), INT;
+  @CF(49) : @R(650.0, 980.0, 680.0, 39.0), @T("Delay FB not used up to now!"), @POU;
+
+  @G(5) :
+     @L(@C(1).Q, @VF(4).i)
+    ;
+  @G(6) :
+     @L(@C(2).Q, @VF(3).i)
+    ;
+  @G(8) :
+     @L(@VF(7).o, @C(2).CLK)
+    ;
+  @G(10) :
+     @L(@VF(9).o, @C(1).CLK)
+    ;
+  @G(16) :
+     @L(@VF(15).o, @C(14).S)
+    ;
+  @G(18) :
+     @L(@VF(17).o, @C(13).S)
+    ;
+  @G(20) :
+     @L(@C(13).Q1, @VF(19).i)
+    ;
+  @G(22) :
+     @L(@C(14).Q1, @VF(21).i)
+    ;
+  @G(26) :
+     @L(@VF(25).o, @C(14).R1)
+    ;
+  @G(28) :
+     @L(@VF(27).o, @C(13).R1)
+    ;
+  @G(34) :
+     @L(@VF(31).o, @C(33).IN1)
+    ;
+  @G(35) :
+     @L(@VF(32).o, @C(33).IN2)
+    ;
+  @G(36) :
+     @L(@C(33).AND, @VF(30).i)
+    ;
+  @G(42) :
+     @L(@VF(40).o, @C(39).IN1)
+    ;
+  @G(43) :
+     @L(@VF(41).o, @C(39).IN2)
+    ;
+  @G(45) :
+     @L(@C(44).MOVE, @VF(38).i)
+    ;
+  @G(46) :
+     @L(@C(39).AND, @C(44).EN)
+    ;
+  @G(48) :
+     @L(@VF(47).o, @C(44).IN)
+    ;
+END_FUNCTION_BLOCK

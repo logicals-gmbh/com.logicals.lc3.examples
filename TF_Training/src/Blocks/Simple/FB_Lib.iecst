@@ -1,0 +1,185 @@
+/*
+ * FB_SR_FF
+ * SR_FlipFlop in ST
+ * 
+ * This is a block which has the RS-FlipFlop function in ST
+ * 
+ * Created:
+ * DG 2019-12-04
+ * 
+ * Modified
+ * DG 2019-12-04
+ * DG 2020-10-28 (Automated Testing)
+ * 
+ */
+FUNCTION_BLOCK FB_SR_FF
+	VAR_INPUT
+		vix_S1 : BOOL;
+		vix_R : BOOL;
+	END_VAR
+	VAR_OUTPUT
+		vox_Q : BOOL;
+	END_VAR
+
+	/*
+	 * SR_FF in ST
+	 */
+	vox_Q := AND(vix_S1, OR(NOT vix_R, vox_Q));
+
+END_FUNCTION_BLOCK
+/*
+ * FB_RS_FF
+ * RS_FlipFlop in ST
+ * 
+ * This is a block which has the RS-FlipFlop function in ST
+ * 
+ * Created:
+ * DG 2019-12-04
+ * 
+ * Modified
+ * DG 2019-12-04
+ * DG 2020-10-28 (Automated Testing)
+ * 
+ */
+FUNCTION_BLOCK FB_RS_FF
+	VAR_INPUT
+		vix_S : BOOL;
+		vix_R1 : BOOL;
+	END_VAR
+	VAR_OUTPUT
+		vox_Q : BOOL;
+	END_VAR
+
+	/*
+	 * RS_FF in ST
+	 */
+	vox_Q := AND(NOT vix_R1, OR(vix_S, vox_Q));
+
+END_FUNCTION_BLOCK
+
+/*
+ * FB_FallTRIG
+ * Detect a falling trigger
+ * 
+ * This is a block, which detects a falling trigger in ST
+ * 
+ * Created:
+ * DG 2019-12-04
+ * 
+ * Modified
+ * DG 2019-12-04
+ * DG 2020-10-28 (Automated Testing)
+ * 
+ */
+FUNCTION_BLOCK FB_FallTRIG
+	VAR_INPUT
+		vix_CLK : BOOL;
+	END_VAR
+	VAR_OUTPUT
+		vox_Q : BOOL;
+	END_VAR
+	VAR
+		lx_M : BOOL := TRUE;
+	END_VAR
+	/*
+	 * Detect a Rising Trigger
+	 */
+	vox_Q := NOT vix_CLK AND NOT lx_M;
+	lx_M  := NOT vix_CLK;
+
+END_FUNCTION_BLOCK
+
+/*
+ * FB_RiseTRIG
+ * Detect a rising trigger
+ * 
+ * This is a block, which detects a rising trigger in ST
+ * 
+ * Created:
+ * DG 2019-12-04
+ * 
+ * Modified
+ * DG 2019-12-04
+ * DG 2020-10-28 (Automated Testing)
+ * 
+ */
+FUNCTION_BLOCK FB_RiseTRIG
+	VAR_INPUT
+		vix_CLK : BOOL;
+	END_VAR
+	VAR_OUTPUT
+		vox_Q : BOOL;
+	END_VAR
+	VAR
+		lx_M : BOOL := FALSE;
+	END_VAR
+	/*
+	 * Detect a Rising Trigger
+	 */
+	vox_Q := vix_CLK AND NOT lx_M;
+	lx_M  := vix_CLK;
+
+END_FUNCTION_BLOCK
+
+/*
+ * FB_Toggle
+ * Toggle the output with each change at the input
+ * 
+ * This block, did NOT use the IEC 6 113-3 R_TRIG
+ * It takes the FB_RiseTRIG
+ * 
+ * Created:
+ * DG 2019-12-04
+ * 
+ * Modified
+ * DG 2019-12-04
+ * DG 2020-10-28 (Automated Testing)
+ * 
+ */
+FUNCTION_BLOCK FB_Toggle
+
+	VAR_INPUT
+		vix_In : BOOL;
+	END_VAR
+
+	VAR_OUTPUT
+		vox_Out : BOOL;
+	END_VAR
+
+	VAR
+		FB_InR_TRIG : FB_RiseTRIG;
+	END_VAR
+
+	FB_InR_TRIG(vix_CLK := vix_In);
+	vox_Out := XOR(FB_InR_TRIG.vox_Q, vox_Out);
+
+END_FUNCTION_BLOCK
+
+/*
+ * FB_1of3Selection
+ * If only one of the three inputs is TRUE, the out ist TRUE
+ * 
+ * Created:
+ * DG 2019-12-04
+ * 
+ * Modified
+ * DG 2019-12-04
+ * DG 2020-10-28 (Automated Testing)
+ * 
+ */
+FUNCTION_BLOCK FB_1of3Selection
+
+	VAR_INPUT
+		vix_In1 : BOOL;
+		vix_In2 : BOOL;
+		vix_In3 : BOOL;
+	END_VAR
+
+	VAR_OUTPUT
+		vox_Out : BOOL;
+	END_VAR
+
+	vox_Out := (vix_In1 AND NOT vix_In2 AND NOT vix_In3) OR
+		       (vix_In2 AND NOT vix_In1 AND NOT vix_In3) OR
+		       (vix_In3 AND NOT vix_In1 AND NOT vix_In2);
+END_FUNCTION_BLOCK

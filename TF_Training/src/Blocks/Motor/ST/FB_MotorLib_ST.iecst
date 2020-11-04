@@ -1,0 +1,211 @@
+/*
+ * Motorblock FB_Motor1D_ST
+ * one turn direction (1D)
+ */
+FUNCTION_BLOCK FB_Motor1D_ST
+
+VAR_INPUT
+  vix_Start    : BOOL;
+  vix_Stop     : BOOL;
+  vix_StartFB  : BOOL;
+  vit_StartFBTime  : TIME := T#10m;  
+END_VAR
+
+VAR_OUTPUT
+  vox_MotorOut    : BOOL;
+  vox_MotorOutFBErr    : BOOL;
+  
+  vox_Err   : BOOL;
+  vox_ErrNo : INT;  
+END_VAR
+
+/*
+ * Function block instances
+ */
+VAR
+  /* Motor state left */
+  FB_MotorRS      : RS;
+  FB_MotorR_TRIG  : R_TRIG;
+  FB_MotorTON     : TON;
+END_VAR
+
+/*
+ * Local VAR
+ */
+VAR
+  lx_MotorStartPulse  : BOOL;
+END_VAR
+
+// 
+// Dynamic Left/Right VAR (R_TRIG)
+FB_MotorR_TRIG (CLK := vix_Start, Q => lx_MotorStartPulse);
+
+//
+// RS for motor start
+FB_MotorRS (S := lx_MotorStartPulse, R1 := vix_Stop, Q1 => vox_MotorOut);
+
+//
+// Error as time delay check for motor start
+FB_MotorTON (IN := vox_MotorOut AND NOT vix_StartFB, PT := vit_StartFBTime, Q => vox_MotorOutFBErr);
+
+END_FUNCTION_BLOCK
+
+
+/*
+ * Motorblock FB_Motor2D_STOP_ST
+ * Two turn direction (2D)
+ * Switch over STOP with Feedback time check
+ */
+FUNCTION_BLOCK FB_Motor2D_STOP_ST
+
+VAR_INPUT
+  vix_Left    : BOOL;
+  vix_Right   : BOOL;
+  vix_Stop    : BOOL;
+
+  vix_LeftFB  : BOOL;
+  vix_RightFB : BOOL;
+
+  vix_MotorProt   : BOOL;
+  
+  vit_LeftFBTime  : TIME := T#10m;  
+  vit_RightFBTime : TIME := T#10m; 
+  
+END_VAR
+
+VAR_OUTPUT
+  vox_MotorLeft    : BOOL;
+  vox_MotorRight   : BOOL;
+
+  vox_LeftFBErr    : BOOL;
+  vox_RightFBErr   : BOOL;
+ /*
+  * Motor protection switch
+  */
+  vix_MotorProtErr : BOOL;
+  
+  vox_Err   : BOOL;
+  vox_ErrNo : INT;  
+END_VAR
+
+/*
+ * Function block instances
+ */
+VAR
+  /* Motor state left */
+  FB_LeftRS   : RS;
+  /* Motor state right */
+  FB_RightRS : RS;
+
+  FB_LeftR_TRIG  : R_TRIG;
+  FB_RightR_TRIG : R_TRIG;  
+
+  FB_LeftTON  : TON;
+  FB_RightTON : TON;  
+  
+END_VAR
+
+/*
+ * Local VAR
+ */
+VAR
+  lx_LeftPulse  : BOOL;
+  lx_RightPulse : BOOL;
+END_VAR
+
+// 
+// Dynamic Left/Right VAR (R_TRIG)
+FB_LeftR_TRIG (CLK := vix_Left, Q => lx_LeftPulse);
+FB_RightR_TRIG(CLK := vix_Right, Q => lx_RightPulse);
+
+//
+// RS for turn left when stop
+FB_LeftRS (S := lx_LeftPulse AND NOT vox_MotorRight, R1 := vix_Stop, Q1 => vox_MotorLeft);
+//
+// RS for turn right when stop
+FB_RightRS(S := lx_RightPulse AND NOT vox_MotorLeft, R1 := vix_Stop, Q1 => vox_MotorRight);
+
+//
+// Error as time delay check for turn left
+FB_LeftTON (IN := vox_MotorLeft AND NOT vix_LeftFB, PT := vit_LeftFBTime, Q => vox_LeftFBErr);
+//
+// Error as time delay check for turn right
+FB_RightTON(IN := vox_MotorRight AND NOT vix_RightFB, PT := vit_RightFBTime, Q => vox_RightFBErr);
+
+END_FUNCTION_BLOCK
+
+/*
+ * Motorblock FB_Motor2D_ST
+ * Two turn direction (2D)
+ * Switch direct with Feedback time check
+ */
+FUNCTION_BLOCK FB_Motor2D_ST
+
+VAR_INPUT
+  vix_Left    : BOOL;
+  vix_Right   : BOOL;
+
+  vix_LeftFB  : BOOL;
+  vix_RightFB : BOOL;
+  
+  vit_LeftFBTime  : TIME := T#10m;  
+  vit_RightFBTime : TIME := T#10m; 
+  
+END_VAR
+
+VAR_OUTPUT
+  vox_MotorLeft    : BOOL;
+  vox_MotorRight   : BOOL;
+
+  vox_LeftFBErr    : BOOL;
+  vox_RightFBErr   : BOOL;
+  
+  vox_Err   : BOOL;
+  vox_ErrNo : INT;  
+END_VAR
+
+/*
+ * Instances of function blocks
+ */
+VAR
+  /* Motor state left */
+  FB_LeftRS   : RS;
+  /* Motor state right */
+  FB_RightRS : RS;
+
+  FB_LeftR_TRIG  : R_TRIG;
+  FB_RightR_TRIG : R_TRIG;  
+
+  FB_LeftTON  : TON;
+  FB_RightTON : TON;  
+  
+END_VAR
+
+/*
+ * Local VAR
+ */
+VAR
+  lx_LeftPulse  : BOOL;
+  lx_RightPulse : BOOL;
+END_VAR
+
+// 
+// R_TRIG Left/Right
+FB_LeftR_TRIG (CLK := vix_Left, Q => lx_LeftPulse);
+FB_RightR_TRIG(CLK := vix_Right, Q => lx_RightPulse);
+
+//
+// RS for turn left
+FB_LeftRS (S := lx_LeftPulse, R1 :=  vox_MotorRight, Q1 => vox_MotorLeft);
+//
+// RS for turn rights
+FB_RightRS(S := lx_RightPulse, R1 :=  vox_MotorLeft, Q1 => vox_MotorRight);
+
+//
+// Error as time delay for turn left
+FB_LeftTON (IN := vox_MotorLeft AND NOT vix_LeftFB, PT := vit_LeftFBTime, Q => vox_LeftFBErr);
+//
+// Error as time delay for turn right
+FB_RightTON(IN := vox_MotorRight AND NOT vix_RightFB, PT := vit_RightFBTime, Q => vox_RightFBErr);
+
+END_FUNCTION_BLOCK

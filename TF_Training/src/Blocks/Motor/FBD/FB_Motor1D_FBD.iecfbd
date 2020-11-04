@@ -1,0 +1,88 @@
+FUNCTION_BLOCK FB_Motor1D_FBD
+  VAR
+    FB_MotorRS : RS;
+    FB_MotorR_TRIG : R_TRIG;
+    FB_MotorTON : TON;
+  END_VAR
+  VAR_INPUT
+    vix_Start : BOOL;
+    vix_Stop : BOOL;
+  END_VAR
+  VAR_OUTPUT
+    vox_MotorOut : BOOL;
+    vox_MotorOutFBErr : BOOL;
+    vox_Err : BOOL;
+    vox_ErrNo : INT;
+  END_VAR
+
+  (*
+
+    // Network 1:
+    FB_MotorR_TRIG(CLK := vix_Start);
+    FB_MotorRS(S := FB_MotorR_TRIG.Q, R1 := vix_Stop, Q1 => vox_MotorOut);
+
+    // Network 2:
+    AND(IN1 := vix_Start, IN2 := vix_Stop, AND => vox_Err);
+
+    // Network 3:
+    AND(IN1 := vix_Start, IN2 := vix_Stop, AND => @C(19).AND);
+    MOVE(EN := @C(19).AND, IN := 1, MOVE => vox_ErrNo);
+
+  *)
+
+  @CF(11) : @R(620.0, 130.0, 670.0, 39.0), @T("Motor_1D"), @POU;
+  @VF(1) : @E(vix_Start), @R(620.0, 210.0, 140.0, 19.0);
+  @VF(2) : @E(vix_Stop), @R(620.0, 260.0, 140.0, 19.0);
+  @C(3) : @FB(FB_MotorR_TRIG), @R(840.0, 210.0, 140.0, 18.0), @I(@N(CLK), @L(9.5)), @O(@N(Q), @R(9.5));
+  @C(4) : @FB(FB_MotorRS), @R(1030.0, 210.0, 80.0, 38.0), @I(@N(S), @L(9.5)), @I(@N(R1), @L(29.5)), @O(@N(Q1), @R(9.5));
+  @VF(8) : @E(vox_MotorOut), @R(1150.0, 210.0, 140.0, 19.0);
+  @CF(10) : @R(620.0, 330.0, 670.0, 39.0), @T("Motor_1D - Error Bit"), @POU;
+  @VF(12) : @E(vix_Start), @R(620.0, 400.0, 140.0, 19.0);
+  @VF(13) : @E(vix_Stop), @R(620.0, 420.0, 140.0, 19.0);
+  @C(14) : @F(AND), @R(860.0, 400.0, 40.0, 38.0), BOOL, @I(@N(IN1), @L(9.5)), @I(@N(IN2), @L(29.5)), @O(@N(AND), @R(9.5));
+  @VF(17) : @E(vox_Err), @R(1150.0, 400.0, 140.0, 19.0);
+  @C(19) : @F(AND), @R(860.0, 560.0, 40.0, 38.0), BOOL, @I(@N(IN1), @L(9.5)), @I(@N(IN2), @L(29.5)), @O(@N(AND), @R(9.5));
+  @VF(20) : @E(vix_Start), @R(620.0, 560.0, 140.0, 19.0);
+  @VF(21) : @E(vix_Stop), @R(620.0, 580.0, 140.0, 19.0);
+  @VF(22) : @E(vox_ErrNo), @R(1150.0, 580.0, 140.0, 19.0);
+  @CF(23) : @R(620.0, 490.0, 670.0, 39.0), @T("Motor_1D - Error No"), @POU;
+  @C(26) : @F(MOVE), @R(1000.0, 560.0, 60.0, 38.0), INT, @I(@N(EN), @L(9.5)), @I(@N(IN), @L(29.5)), @O(@N(ENO), @R(9.5)), @O(@N(MOVE), @R(29.5));
+  @VF(29) : @E(1), @R(760.0, 620.0, 140.0, 19.0), INT;
+
+  @G(5) :
+     @L(@VF(1).o, @C(3).CLK)
+    ;
+  @G(6) :
+     @L(@C(3).Q, @C(4).S)
+    ;
+  @G(7) :
+     @L(@VF(2).o, @C(4).R1)
+    ;
+  @G(9) :
+     @L(@C(4).Q1, @VF(8).i)
+    ;
+  @G(15) :
+     @L(@VF(12).o, @C(14).IN1)
+    ;
+  @G(16) :
+     @L(@VF(13).o, @C(14).IN2)
+    ;
+  @G(18) :
+     @L(@C(14).AND, @VF(17).i)
+    ;
+  @G(24) :
+     @L(@VF(20).o, @C(19).IN1)
+    ;
+  @G(25) :
+     @L(@VF(21).o, @C(19).IN2)
+    ;
+  @G(27) :
+     @L(@C(19).AND, @C(26).EN)
+    ;
+  @G(28) :
+     @L(@C(26).MOVE, @VF(22).i)
+    ;
+  @G(30) :
+     @L(@VF(29).o, @C(26).IN)
+    ;
+END_FUNCTION_BLOCK
