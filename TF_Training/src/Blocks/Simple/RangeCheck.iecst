@@ -1,0 +1,29 @@
+/* This function checks, whether a given value (in_iValue) is within a given range (in_iLow, in_iHigh).
+ * It returns:
+ * -10: If the lower limit is greater than the upper limit.
+ * -1: If the value is less than the lower limit.
+ * 0: If the value is between the lower and the upper limit.
+ * 1: If the value is greater than the upper limit.
+ * */
+FUNCTION RangeCheck
+	VAR_INPUT
+		in_iValue : INT;
+		in_iLow : INT;
+		in_iHigh : INT;
+	END_VAR
+	VAR_OUTPUT
+		out_siInOutErr : SINT;
+	END_VAR
+
+	IF in_iLow > in_iHigh THEN
+		out_siInOutErr := -10;
+	ELSE
+		IF in_iValue < in_iLow THEN
+			out_siInOutErr := -1;
+		ELSE
+			IF in_iValue > in_iHigh THEN
+				out_siInOutErr := 1;
+			END_IF;
+		END_IF;
+	END_IF;
+END_FUNCTION
